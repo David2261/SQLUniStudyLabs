@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}{% endblock %} - Магазин</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-gray-100">
+        <!-- Навигация -->
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="flex-shrink-0 flex items-center">
+                            <a href="{{ url_for('auth.index') }}" class="flex items-center">
+                                <img src="{{ url_for('static', filename='logo.png') }}" alt="Логотип" class="h-12 w-auto">
+                            </a>
+                        </div>
+                        <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                            <a href="{{ url_for('auth.products') }}" 
+                               class="{% if request.endpoint == 'auth.products' %}border-indigo-500 text-gray-900{% else %}border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700{% endif %} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                Товары
+                            </a>
+                            {% if current_user.is_authenticated %}
+                                {% if current_user.role_id == 2 %}
+                                    <a href="{{ url_for('auth.my_products') }}" 
+                                       class="{% if request.endpoint == 'auth.my_products' %}border-indigo-500 text-gray-900{% else %}border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700{% endif %} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                        Мои товары
+                                    </a>
+                                    <a href="{{ url_for('auth.add_product') }}" 
+                                       class="{% if request.endpoint == 'auth.add_product' %}border-indigo-500 text-gray-900{% else %}border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700{% endif %} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                        Добавить товар
+                                    </a>
+                                {% endif %}
+                                <a href="{{ url_for('auth.product_stats') }}" 
+                                   class="{% if request.endpoint == 'auth.product_stats' %}border-indigo-500 text-gray-900{% else %}border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700{% endif %} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                    Статистика
+                                </a>
+                                <a href="{{ url_for('auth.search_products') }}" 
+                                   class="{% if request.endpoint == 'auth.search_products' %}border-indigo-500 text-gray-900{% else %}border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700{% endif %} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                    Поиск
+                                </a>
+                                <a href="{{ url_for('auth.top_products') }}" 
+                                   class="{% if request.endpoint == 'auth.top_products' %}border-indigo-500 text-gray-900{% else %}border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700{% endif %} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                    Топ товаров
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                        {% if current_user.is_authenticated %}
+                            <div class="ml-3 relative">
+                                <div>
+                                    <button type="button" class="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                                        <span class="sr-only">Открыть меню пользователя</span>
+                                        <span class="text-gray-700">{{ current_user.username }}</span>
+                                    </button>
+                                </div>
+                                <div class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" tabindex="-1">
+                                    <a href="{{ url_for('auth.dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Личный кабинет</a>
+                                    <a href="{{ url_for('auth.edit_profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Редактировать профиль</a>
+                                    <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Выйти</a>
+                                </div>
+                            </div>
+                        {% else %}
+                            <a href="{{ url_for('auth.login') }}" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">Войти</a>
+                            <a href="{{ url_for('auth.register') }}" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">Регистрация</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Основной контент -->
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="mb-4 p-4 rounded-md {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            {% block content %}{% endblock %}
+        </main>
+
+        <!-- Подвал сайта -->
+        <footer class="bg-white shadow-md mt-8">
+            <div class="container mx-auto px-4 py-4 text-center text-gray-600">
+                &copy; 2024 Магазин. Все права защищены.
+            </div>
+        </footer>
+
+        <script>
+            // Скрипт для выпадающего меню пользователя
+            document.getElementById('user-menu-button').addEventListener('click', function() {
+                document.getElementById('user-menu').classList.toggle('hidden');
+            });
+        </script>
+    </body>
+</html>

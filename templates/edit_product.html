@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Редактировать товар{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold mb-8">Редактировать товар</h1>
+
+    <form method="POST" enctype="multipart/form-data" class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Название товара</label>
+            <input type="text" name="productname" value="{{ product.productname }}" required
+                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Цена</label>
+            <input type="number" name="price" value="{{ product.price }}" step="0.01" required
+                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Категория</label>
+            <select name="category_id" required
+                    class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                {% for category in categories %}
+                <option value="{{ category.id }}" {% if category.id == product.category_id %}selected{% endif %}>
+                    {{ category.category_name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Изображение товара</label>
+            {% if product.product_image %}
+            <div class="mb-4">
+                <img src="{{ url_for('static', filename=get_product_image_path(product)) }}" 
+                     alt="{{ product.productname }}" 
+                     class="w-32 h-32 object-cover rounded-md">
+            </div>
+            {% endif %}
+            <input type="file" name="product_image" accept="image/*"
+                   class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            <p class="mt-1 text-sm text-gray-500">Оставьте пустым, чтобы сохранить текущее изображение</p>
+        </div>
+
+        <div class="mb-6">
+            <label class="flex items-center">
+                <input type="checkbox" name="is_published" {% if product.is_published %}checked{% endif %}
+                       class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                <span class="ml-2 text-sm text-gray-700">Опубликовать товар</span>
+            </label>
+        </div>
+
+        <div class="flex space-x-4">
+            <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
+                Сохранить изменения
+            </button>
+            <a href="{{ url_for('auth.my_products') }}" 
+               class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300">
+                Отмена
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %} 

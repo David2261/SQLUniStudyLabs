@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Мои товары{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-bold">Мои товары</h1>
+        <a href="{{ url_for('auth.add_product') }}" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
+            Добавить товар
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {% for product in products %}
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <div class="h-48 overflow-hidden">
+                <img src="{{ url_for('static', filename=get_product_image_path(product)) }}" 
+                     alt="{{ product.productname }}" 
+                     class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+            </div>
+            <div class="p-4">
+                <h3 class="text-lg font-semibold mb-2">{{ product.productname }}</h3>
+                <p class="text-gray-600 mb-2">
+                    {% for category in categories %}
+                        {% if category.id == product.category_id %}
+                            {{ category.category_name }}
+                        {% endif %}
+                    {% endfor %}
+                </p>
+                <p class="text-xl font-bold text-indigo-600 mb-4">{{ product.price }} ₽</p>
+                <div class="flex space-x-2">
+                    <a href="{{ url_for('auth.edit_product', product_id=product.id) }}" 
+                       class="flex-1 bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 transition-colors text-center">
+                        Редактировать
+                    </a>
+                    <form action="{{ url_for('auth.delete_product', product_id=product.id) }}" method="POST" class="flex-1">
+                        <button type="submit" 
+                                class="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition-colors"
+                                onclick="return confirm('Вы уверены, что хотите удалить этот товар?')">
+                            Удалить
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-span-full text-center py-8">
+            <p class="text-gray-500 text-lg">У вас пока нет товаров</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Регистрация{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold mb-6 text-center">Регистрация</h2>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mb-4 p-4 rounded {% if category == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST" class="space-y-4">
+            <div>
+                <label for="first_name" class="block text-sm font-medium text-gray-700">Имя</label>
+                <input type="text" id="first_name" name="first_name" required
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+            
+            <div>
+                <label for="middle_name" class="block text-sm font-medium text-gray-700">Отчество</label>
+                <input type="text" id="middle_name" name="middle_name"
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+            
+            <div>
+                <label for="last_name" class="block text-sm font-medium text-gray-700">Фамилия</label>
+                <input type="text" id="last_name" name="last_name" required
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+            
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                <input type="email" id="email" name="email" required
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+            
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">Пароль</label>
+                <input type="password" id="password" name="password" required
+                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Роль</label>
+                <div class="mt-2 space-y-2">
+                    <div class="flex items-center">
+                        <input type="radio" id="role_user" name="role" value="3" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300" checked>
+                        <label for="role_user" class="ml-2 block text-sm text-gray-900">Пользователь</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="radio" id="role_seller" name="role" value="2" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300">
+                        <label for="role_seller" class="ml-2 block text-sm text-gray-900">Продавец</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Зарегистрироваться
+                </button>
+            </div>
+        </form>
+        
+        <div class="mt-4 text-center">
+            <p class="text-sm text-gray-600">
+                Уже есть аккаунт? <a href="{{ url_for('auth.login') }}" class="text-indigo-600 hover:text-indigo-500">Войти</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

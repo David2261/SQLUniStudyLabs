@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="text-center">
+        <h1 class="text-4xl font-bold mb-4">Добро пожаловать в наш магазин!</h1>
+        <p class="text-xl mb-8">Для просмотра товаров, пожалуйста, войдите или зарегистрируйтесь.</p>
+        <div class="space-x-4">
+            {% if not current_user.is_authenticated %}
+            <a href="{{ url_for('auth.login') }}" class="bg-indigo-600 text-white px-6 py-3 rounded-md hover:bg-indigo-700">
+                Войти
+            </a>
+            <a href="{{ url_for('auth.register') }}" class="bg-gray-600 text-white px-6 py-3 rounded-md hover:bg-gray-700">
+                Зарегистрироваться
+            </a>
+            {% else %}
+            <a href="{{ url_for('auth.products') }}" class="bg-indigo-600 text-white px-6 py-3 rounded-md hover:bg-indigo-700">
+                Перейти к товарам
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

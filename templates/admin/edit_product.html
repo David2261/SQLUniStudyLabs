@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Редактирование товара{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Редактирование товара</h1>
+
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <form method="POST" enctype="multipart/form-data" action="{{ url_for('auth.update_product', product_id=product.id) }}">
+            <div class="space-y-6">
+                <div>
+                    <label for="productname" class="block text-sm font-medium text-gray-700">Название товара</label>
+                    <input type="text" id="productname" name="productname" value="{{ product.productname }}" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label for="price" class="block text-sm font-medium text-gray-700">Цена</label>
+                    <input type="number" id="price" name="price" value="{{ product.price }}" required min="0" step="0.01"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label for="category_id" class="block text-sm font-medium text-gray-700">Категория</label>
+                    <select id="category_id" name="category_id" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="">Выберите категорию</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if product.category_id == category.id %}selected{% endif %}>
+                            {{ category.category_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="supplier_id" class="block text-sm font-medium text-gray-700">Поставщик</label>
+                    <select id="supplier_id" name="supplier_id" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="">Выберите поставщика</option>
+                        {% for supplier in suppliers %}
+                        <option value="{{ supplier.id }}" {% if product.supplier_id == supplier.id %}selected{% endif %}>
+                            {{ supplier.supplier_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label for="quantity" class="block text-sm font-medium text-gray-700">Количество</label>
+                    <input type="number" id="quantity" name="quantity" value="{{ product.quantity }}" required min="0"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label for="image" class="block text-sm font-medium text-gray-700">Изображение</label>
+                    {% if product.image %}
+                    <div class="mt-2">
+                        <img src="{{ product.image }}" alt="{{ product.productname }}" class="h-32 w-32 object-cover rounded-md">
+                    </div>
+                    {% endif %}
+                    <input type="file" id="image" name="image" accept="image/*"
+                        class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                </div>
+
+                <div>
+                    <label for="is_published" class="flex items-center">
+                        <input type="checkbox" id="is_published" name="is_published" {% if product.is_published %}checked{% endif %}
+                            class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <span class="ml-2 text-sm text-gray-700">Опубликовать товар</span>
+                    </label>
+                </div>
+
+                <div class="flex justify-end space-x-4">
+                    <a href="{{ url_for('auth.admin_dashboard') }}"
+                        class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                        Отмена
+                    </a>
+                    <button type="submit"
+                        class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        Сохранить
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Пользователь {{ user.username }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Пользователь {{ user.username }}</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Информация о пользователе -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold mb-4">Основная информация</h2>
+            <div class="space-y-4">
+                <div>
+                    <p class="text-gray-600">Имя пользователя:</p>
+                    <p class="font-semibold">{{ user.username }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-600">Email:</p>
+                    <p class="font-semibold">{{ user.email }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-600">Роль:</p>
+                    <p class="font-semibold">{{ user.role.name }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-600">Статус:</p>
+                    <p class="font-semibold">
+                        <span class="px-2 py-1 rounded-full {% if user.is_active %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                            {{ 'Активен' if user.is_active else 'Заблокирован' }}
+                        </span>
+                    </p>
+                </div>
+                <div>
+                    <p class="text-gray-600">Дата регистрации:</p>
+                    <p class="font-semibold">{{ user.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Статистика пользователя -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold mb-4">Статистика</h2>
+            <div class="space-y-4">
+                <div>
+                    <p class="text-gray-600">Количество заказов:</p>
+                    <p class="font-semibold">{{ orders_count }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-600">Общая сумма заказов:</p>
+                    <p class="font-semibold">{{ total_spent }} ₽</p>
+                </div>
+                {% if user.role.name == 'seller' %}
+                <div>
+                    <p class="text-gray-600">Количество товаров:</p>
+                    <p class="font-semibold">{{ products_count }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-600">Общий доход:</p>
+                    <p class="font-semibold">{{ total_income }} ₽</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Действия -->
+    <div class="bg-white p-6 rounded-lg shadow-md mt-8">
+        <h2 class="text-2xl font-bold mb-4">Действия</h2>
+        <div class="flex space-x-4">
+            <a href="{{ url_for('auth.edit_user', user_id=user.id) }}"
+                class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                Редактировать
+            </a>
+            {% if user.is_active %}
+            <button onclick="blockUser({{ user.id }})"
+                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                Заблокировать
+            </button>
+            {% else %}
+            <button onclick="unblockUser({{ user.id }})"
+                class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                Разблокировать
+            </button>
+            {% endif %}
+            <a href="{{ url_for('auth.admin_dashboard') }}"
+                class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                Назад
+            </a>
+        </div>
+    </div>
+
+    <!-- История заказов -->
+    {% if orders %}
+    <div class="bg-white p-6 rounded-lg shadow-md mt-8">
+        <h2 class="text-2xl font-bold mb-4">История заказов</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="px-6 py-3 text-left">ID</th>
+                        <th class="px-6 py-3 text-left">Дата</th>
+                        <th class="px-6 py-3 text-left">Сумма</th>
+                        <th class="px-6 py-3 text-left">Статус</th>
+                        <th class="px-6 py-3 text-left">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr class="border-b">
+                        <td class="px-6 py-4">{{ order.id }}</td>
+                        <td class="px-6 py-4">{{ order.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+                        <td class="px-6 py-4">{{ order.total_amount }} ₽</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 rounded-full {% if order.status == 'completed' %}bg-green-100 text-green-800{% elif order.status == 'pending' %}bg-yellow-100 text-yellow-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                {{ order.status }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <a href="{{ url_for('auth.order_details', order_id=order.id) }}"
+                                class="text-indigo-600 hover:text-indigo-900">
+                                Подробнее
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function blockUser(userId) {
+    if (confirm('Вы уверены, что хотите заблокировать этого пользователя?')) {
+        fetch(`/users/${userId}/block`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+}
+
+function unblockUser(userId) {
+    if (confirm('Вы уверены, что хотите разблокировать этого пользователя?')) {
+        fetch(`/users/${userId}/unblock`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+}
+</script>
+{% endblock %} 

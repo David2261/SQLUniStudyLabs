@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Заказ #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-4xl mx-auto">
+        <!-- Заголовок -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold">Заказ #{{ order.id }}</h1>
+            <span class="px-4 py-2 rounded-full {% if order.status == 'completed' %}bg-green-100 text-green-800{% elif order.status == 'pending' %}bg-yellow-100 text-yellow-800{% elif order.status == 'cancelled' %}bg-red-100 text-red-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                {{ order.status }}
+            </span>
+        </div>
+
+        <!-- Информация о заказе -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h2 class="text-xl font-semibold mb-4">Информация о заказе</h2>
+                    <div class="space-y-2">
+                        <p><span class="text-gray-600">Дата заказа:</span> {{ order.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                        <p><span class="text-gray-600">Общая сумма:</span> {{ order.total_amount }} ₽</p>
+                        <p><span class="text-gray-600">Статус оплаты:</span> 
+                            <span class="{% if order.payment_status == 'paid' %}text-green-600{% else %}text-red-600{% endif %}">
+                                {{ 'Оплачено' if order.payment_status == 'paid' else 'Не оплачено' }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="text-xl font-semibold mb-4">Информация о доставке</h2>
+                    <div class="space-y-2">
+                        <p><span class="text-gray-600">Способ доставки:</span> {{ order.delivery_method }}</p>
+                        <p><span class="text-gray-600">Адрес доставки:</span> {{ order.delivery_address }}</p>
+                        <p><span class="text-gray-600">Статус доставки:</span> {{ order.delivery_status }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Список товаров -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">Товары в заказе</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="px-6 py-3 text-left">Товар</th>
+                            <th class="px-6 py-3 text-left">Цена</th>
+                            <th class="px-6 py-3 text-left">Количество</th>
+                            <th class="px-6 py-3 text-left">Сумма</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.items %}
+                        <tr class="border-b">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center">
+                                    <img src="{{ item.product.product_image }}" alt="{{ item.product.productname }}" 
+                                         class="w-16 h-16 object-cover rounded-md mr-4">
+                                    <div>
+                                        <p class="font-semibold">{{ item.product.productname }}</p>
+                                        <p class="text-gray-600 text-sm">
+                                            {% for category in categories %}
+                                                {% if category.id == item.product.category_id %}
+                                                    {{ category.category_name }}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">{{ item.price }} ₽</td>
+                            <td class="px-6 py-4">{{ item.quantity }}</td>
+                            <td class="px-6 py-4">{{ item.price * item.quantity }} ₽</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr class="bg-gray-50">
+                            <td colspan="3" class="px-6 py-4 text-right font-semibold">Итого:</td>
+                            <td class="px-6 py-4 font-semibold">{{ order.total_amount }} ₽</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- Действия -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-4">Действия</h2>
+            <div class="flex space-x-4">
+                {% if order.status == 'pending' %}
+                <button onclick="cancelOrder({{ order.id }})"
+                    class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                    Отменить заказ
+                </button>
+                {% endif %}
+                <a href="{{ url_for('auth.dashboard') }}"
+                    class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                    Вернуться в личный кабинет
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function cancelOrder(orderId) {
+    if (confirm('Вы уверены, что хотите отменить этот заказ?')) {
+        fetch(`/orders/${orderId}/cancel`, {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+}
+</script>
+{% endblock %} 

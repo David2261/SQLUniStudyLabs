@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Заказ #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Заказ #{{ order.id }}</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Информация о заказе -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold mb-4">Детали заказа</h2>
+            <div class="space-y-4">
+                <div>
+                    <p class="text-gray-600">Статус:</p>
+                    <p class="font-semibold">
+                        <span class="px-2 py-1 rounded-full {% if order.status == 'completed' %}bg-green-100 text-green-800{% elif order.status == 'pending' %}bg-yellow-100 text-yellow-800{% else %}bg-red-100 text-red-800{% endif %}">
+                            {{ order.status }}
+                        </span>
+                    </p>
+                </div>
+                <div>
+                    <p class="text-gray-600">Дата заказа:</p>
+                    <p class="font-semibold">{{ order.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-600">Сумма заказа:</p>
+                    <p class="font-semibold">{{ order.total_amount }} ₽</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Информация о доставке -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold mb-4">Информация о доставке</h2>
+            <div class="space-y-4">
+                <div>
+                    <p class="text-gray-600">ФИО:</p>
+                    <p class="font-semibold">{{ order.name }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-600">Email:</p>
+                    <p class="font-semibold">{{ order.email }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-600">Телефон:</p>
+                    <p class="font-semibold">{{ order.phone }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-600">Адрес доставки:</p>
+                    <p class="font-semibold">{{ order.address }}</p>
+                </div>
+                {% if order.comment %}
+                <div>
+                    <p class="text-gray-600">Комментарий:</p>
+                    <p class="font-semibold">{{ order.comment }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Товары в заказе -->
+    <div class="bg-white p-6 rounded-lg shadow-md mt-8">
+        <h2 class="text-2xl font-bold mb-4">Товары в заказе</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="px-6 py-3 text-left">Товар</th>
+                        <th class="px-6 py-3 text-left">Цена</th>
+                        <th class="px-6 py-3 text-left">Количество</th>
+                        <th class="px-6 py-3 text-left">Сумма</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items %}
+                    <tr class="border-b">
+                        <td class="px-6 py-4">{{ item.product.productname }}</td>
+                        <td class="px-6 py-4">{{ item.price }} ₽</td>
+                        <td class="px-6 py-4">{{ item.quantity }}</td>
+                        <td class="px-6 py-4">{{ item.price * item.quantity }} ₽</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" class="px-6 py-4 text-right font-bold">Итого:</td>
+                        <td class="px-6 py-4 font-bold">{{ order.total_amount }} ₽</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-8">
+        <a href="{{ url_for('auth.dashboard') }}"
+            class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+            Вернуться в личный кабинет
+        </a>
+    </div>
+</div>
+{% endblock %} 

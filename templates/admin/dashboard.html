@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Панель администратора{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Панель администратора</h1>
+
+    <!-- Статистика -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-semibold mb-2">Пользователи</h3>
+            <p class="text-2xl font-bold text-indigo-600">{{ users_count }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-semibold mb-2">Товары</h3>
+            <p class="text-2xl font-bold text-indigo-600">{{ products_count }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-lg font-semibold mb-2">Заказы</h3>
+            <p class="text-2xl font-bold text-indigo-600">{{ orders_count }}</p>
+        </div>
+    </div>
+
+    <!-- Управление пользователями -->
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+        <h2 class="text-2xl font-bold mb-4">Управление пользователями</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="px-6 py-3 text-left">ID</th>
+                        <th class="px-6 py-3 text-left">Имя пользователя</th>
+                        <th class="px-6 py-3 text-left">Email</th>
+                        <th class="px-6 py-3 text-left">Роль</th>
+                        <th class="px-6 py-3 text-left">Статус</th>
+                        <th class="px-6 py-3 text-left">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr class="border-b">
+                        <td class="px-6 py-4">{{ user.id }}</td>
+                        <td class="px-6 py-4">{{ user.username }}</td>
+                        <td class="px-6 py-4">{{ user.email }}</td>
+                        <td class="px-6 py-4">{{ user.role.name }}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 rounded-full {% if user.is_active %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                {{ 'Активен' if user.is_active else 'Заблокирован' }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex space-x-2">
+                                <a href="{{ url_for('auth.edit_user', user_id=user.id) }}" class="text-indigo-600 hover:text-indigo-900">Редактировать</a>
+                                {% if user.is_active %}
+                                <a href="{{ url_for('auth.block_user', user_id=user.id) }}" class="text-red-600 hover:text-red-900">Заблокировать</a>
+                                {% else %}
+                                <a href="{{ url_for('auth.unblock_user', user_id=user.id) }}" class="text-green-600 hover:text-green-900">Разблокировать</a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Управление товарами -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold mb-4">Управление товарами</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="px-6 py-3 text-left">ID</th>
+                        <th class="px-6 py-3 text-left">Название</th>
+                        <th class="px-6 py-3 text-left">Цена</th>
+                        <th class="px-6 py-3 text-left">Категория</th>
+                        <th class="px-6 py-3 text-left">Продавец</th>
+                        <th class="px-6 py-3 text-left">Статус</th>
+                        <th class="px-6 py-3 text-left">Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr class="border-b">
+                        <td class="px-6 py-4">{{ product.id }}</td>
+                        <td class="px-6 py-4">{{ product.productname }}</td>
+                        <td class="px-6 py-4">{{ product.price }} ₽</td>
+                        <td class="px-6 py-4">{{ product.category.category_name }}</td>
+                        <td class="px-6 py-4">{{ product.supplier.supplier_name }}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 rounded-full {% if product.is_published %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                {{ 'Опубликован' if product.is_published else 'Не опубликован' }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex space-x-2">
+                                <a href="{{ url_for('auth.edit_product', product_id=product.id) }}" class="text-indigo-600 hover:text-indigo-900">Редактировать</a>
+                                {% if product.is_published %}
+                                <a href="{{ url_for('auth.unpublish_product', product_id=product.id) }}" class="text-red-600 hover:text-red-900">Снять с публикации</a>
+                                {% else %}
+                                <a href="{{ url_for('auth.publish_product', product_id=product.id) }}" class="text-green-600 hover:text-green-900">Опубликовать</a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %} 
